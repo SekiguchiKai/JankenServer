@@ -1,5 +1,4 @@
 /*このファイルの機能は以下
-
 ①1=グー、2=チョキ、3=パーとして打ち手に数字を割り当てる
 
 ②乱数を発生させて、機械の打ち手を決める
@@ -16,16 +15,19 @@ package main
 import(
 	"math/rand"
 	"time"
-
 )
+
+
 
 type Janken struct{
 
 	//機械の打ち手
-	serverUchite int
+	serverUchite *int
+
 
 	//勝敗の結果を代入するもの
-	result string
+	result *string
+
 }
 
 
@@ -41,7 +43,7 @@ func (j *Janken) decisionUchite() {
 //機械とクライアントの勝敗を決定するメソッド
 //クライアントの打ち手を引数に勝敗をジャッジ
 //cu = clientUchite
-func (j *Janken) JudgeGame (cu *int) string{
+func (j *Janken) JudgeGame (cu int) (int, string){
 	//じゃんけんアルゴリズム
 	//機械の打ち手をjuに代入
 	jsu := j.serverUchite
@@ -50,19 +52,19 @@ func (j *Janken) JudgeGame (cu *int) string{
 
 	switch jcu, jsu{
 	//クライアントが勝ちの場合
-	case (jcu == 0 && jsu == 2) || (jcu == 1 && jsu == 0) || (jcu == 2 && jsu == 1):
+	case (jcu == 0 && jsu == 1) || (jcu == 1 && jsu == 2) || (jcu == 2 && jsu == 0):
 		j.result = "あなたの勝ち"
 	//サーバが勝ちの場合
-	case (jcu == 2 && jsu == 0) || (jcu == 0 && jsu == 1) || (jcu == 1 && jsu == 2):
+	case (jcu == 1 && jsu == 0) || (jcu == 2 && jsu == 1) || (jcu == 0 && jsu == 2):
 		j.result = "あなたの負け"
 	//引き分けの場合
 	case jcu == jsu:
 		j.result = "引き分けね"
 	}
 
-	return j.result
+	return j.serverUchite, j.result
 
 }
 
-
+//0=グー、1-=チョキ、2=パー
 

@@ -8,16 +8,16 @@ import (
 
 //templateで使用するためのデータ型を作成する
 type JankenHTML struct {
-	Uchite string
-	Shouhai string
+	ClientUchite string //クライアントの打ち手
+	ServeUchite string //サーバの打ち手
+	Result string //結果
 }
 
 //HTMLをパースするための関数
 func htmlHandler(w http.ResponseWriter, r *http.Request) {
-	jankenHTML := JankenHTML{Uchite:"グー", Shouhai:"勝ち!"}
 
 	//index.htmlをパースする。
-	templ, err := template.ParseFiles("../template/index.html")
+	templ, err := template.ParseFiles("./template/index.html")
 
 	if err != nil {
 		fmt.Println(err)//エラー処理
@@ -26,7 +26,7 @@ func htmlHandler(w http.ResponseWriter, r *http.Request) {
 	/*template.Executeは、エラーがなければ、パースしたtemplateを指定したデータオブジェクトにして、
 	w http.ResponseWriterに出力してくれる。エラーが起きれば、戻り値の値が入る
 	 */
-	err = templ.Execute(w, jankenHTML)
+	err = templ.Execute(w, nil)
 
 	if err != nil {
 		fmt.Println(err)
@@ -37,7 +37,8 @@ func htmlHandler(w http.ResponseWriter, r *http.Request) {
 
 
 //formを受け取り、anken_model.goに処理をさせるメソッド
-func ProcessJudge(r *http.Request) string{
+
+func (jH *JankenHTML) ProcessJudge(w http.ResponseWriter, r *http.Request) {
 	//POSTのときはリクエストのボディをフォームとして解析する
 	//r.Form（http.Request.Formに値が格納される）
 	//戻り値は、err
@@ -48,13 +49,42 @@ func ProcessJudge(r *http.Request) string{
 	}
 	//clientFormの構造体のclientUchiteに代入
 	//型変換
-	ClientUchite := int(r.Form)
+	clientUchite := int(r.Form)
 
 	//クライアントの打ち手を引数に渡して、Janken.judgeGameに勝敗を決めさせる
-	result := Janken.JudgeGame(*ClientUchite)
+	serveUchite, result := Janken.JudgeGame(clientUchite)
+
+	//HTMLに表示するためにstructの値代入
+	jH.Result = result
+
+	//0=グー、1-=チョキ、2=パー
+	//数字=>string
+	switch clientUchite {
+	case 0:
+		jH.ServeUchite = "グー"
+	case 1:
+		jH.ServeUchite = "チョキ"
+	case 2:
+		jH.ServeUchite = "パー"
+
+	}
+
+	//0=グー、1-=チョキ、2=パー
+	//数字=>string
+	switch serveUchite {
+	case 0:
+		jH.ServeUchite = "グー"
+	case 1:
+		jH.ServeUchite = "チョキ"
+	case 2:
+		jH.ServeUchite = "パー"
+
+	}
+
+
+	//result.htmlへリダイレクト
+	http.Redirect(w, r, "./result.html", 301)
 }
-
-
 
 
 func main() {
@@ -66,7 +96,8 @@ func main() {
 
 
 	//form入力後に表示させる"/Result"に対して、リクエストハンドラであるhtmlHandlerをバンドル
-	http.HandleFunc("/Result", ProcessJudge)
+	http.HandleFunc("/Result", JankenHTML.ProcessJudge)
+
 
 
 }
