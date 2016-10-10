@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charaset="UTF-8">
+    <title>じゃんけんサーバ</title>
+</head>
+<body>
+<h1>じゃんけんで勝負だ！</h1>
+
+<p>以下の中から、自分の打ち手を選べ！！</p>
+<form action="/Result"  method="post" ></form>
+<div>
+    <label for="gu"></label>
+    <label for="gu">グー</label>
+    <input type="radio" name="uchite" value="0" checked="checked" id="gu">
+    <label for="tyoki">チョキ</label>
+    <input type="radio" name="uchite" value="1" id="tyoki">
+    <label for="pa">パー</label>
+    <input type="radio" name="uchite" value="2" id="pa">
+    <input type=submit name=submit value=打ち手決定>
+</div>
+
+<p>ジャーンケン...</p>
+
+<p>{{.Uchite}}</p>
+
+<p>お前の{{.Shouhai}}だ</p>
+</body>
+
+</html>
